@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+'use client'
+import React from 'react';
+import ResponsiveAppBar from './components/Header/header';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import BasicTable from './components/Tabla/tabla';
+import Doc from './components/Doc/doc';
+import Calendario from './components/Calendario/calendario';
 
-function App() {
+
+
+export default  function App ()  {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+   <Router>
+    <ResponsiveAppBar />
+            <Routes>
+                <Route path="/calendario" element={<Calendario />} />
+                <Route path="/tabla" element={<BasicTable />} />
+                <Route path="/doc" element={<Doc />} />
+            </Routes>
+        </Router>
   );
-}
-
-export default App;
+};
