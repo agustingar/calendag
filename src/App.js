@@ -1,4 +1,3 @@
-'use client'
 import React from 'react';
 import ResponsiveAppBar from './components/Header/header';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
