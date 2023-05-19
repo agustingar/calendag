@@ -17,6 +17,8 @@ const Calendario = () => {
 
   const handleDayClick = (day) => {
     setSelectedDay(day);
+    setTask('');
+    setTime('');
     setModalOpen(true);
   };
 
@@ -67,20 +69,6 @@ const Calendario = () => {
     }
   };
 
-  const handleDeleteTask = (day, index) => {
-    const formattedDate = format(day, 'dd/MM/yyyy');
-    const tasks = tasksByDay[formattedDate];
-
-    if (tasks) {
-      const updatedTasks = tasks.filter((taskObj, taskIndex) => taskIndex !== index);
-      const updatedTasksByDay = {
-        ...tasksByDay,
-        [formattedDate]: updatedTasks.length > 0 ? updatedTasks : null
-      };
-      setTasksByDay(updatedTasksByDay);
-    }
-  };
-
   const handleCompleteTask = (day, index) => {
     const formattedDate = format(day, 'dd/MM/yyyy');
     const tasks = tasksByDay[formattedDate];
@@ -98,12 +86,11 @@ const Calendario = () => {
 
       const updatedTasksByDay = {
         ...tasksByDay,
-        [formattedDate]: updatedTasks.filter((taskObj) => !taskObj.completed)
+        [formattedDate]: updatedTasks
       };
       setTasksByDay(updatedTasksByDay);
     }
   };
-
   const handlePrevMonth = () => {
     setCurrentDate((prevDate) => subMonths(prevDate, 1));
   };
@@ -126,7 +113,6 @@ const Calendario = () => {
               <div className="day-number">{format(day, 'dd')}</div>
               <div className="day-text">
                 {format(day, 'EEEE')}
-               
               </div>
               {tasksByDay[format(day, 'dd/MM/yyyy')] &&
                 tasksByDay[format(day, 'dd/MM/yyyy')].map((task, index) => (
@@ -160,34 +146,38 @@ const Calendario = () => {
       )}
       <div className="task-table">
         <h3>Tasks</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Task</th>
-              <th>Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(tasksByDay).map(([date, tasks]) =>
-              tasks &&
-              tasks.map((task, index) => (
-                <tr key={`${date}-${index}`}>
-                  <td>{format(new Date(date), 'EEEE, dd MMMM yyyy')}</td>
-                  <td>{task.task}</td>
-                  <td>{task.time}</td>
-                  <td>
-                    <button onClick={() => handleEditTask(new Date(date), index)}>Edit</button>
-                    <button onClick={() => handleCompleteTask(new Date(date), index)}>
-                      {task.completed ? 'Completed' : 'Check'}
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Task</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(tasksByDay).map(([date, tasks]) =>
+                tasks &&
+                tasks.map((task, index) => (
+                  <tr key={`${date}-${index}`}>
+                    <td>{format(new Date(date), 'EEEE, dd MMMM yyyy')}</td>
+                    <td>{task.task}</td>
+                    <td>{task.time}</td>
+                    <td>
+                      <button className="edit-button" onClick={() => handleEditTask(new Date(date), index)}>Edit</button>
+                      <input
+                        type="checkbox"
+                        defaultChecked={task.completed}
+                        onChange={() => handleCompleteTask(new Date(date), index)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

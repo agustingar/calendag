@@ -115,4 +115,27 @@
   .calendar {
     width: auto;
   }
+  .calendar-header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .calendar-header button {
+    margin-bottom: 10px;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+  }
+  table {
+    min-width: 500px;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    white-space: nowrap;
+    padding: 8px;
+  }
+  .edit-button {
+    margin-right: 8px;
+  }
 }
