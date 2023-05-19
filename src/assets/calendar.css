@@ -15,10 +15,11 @@
 
 .calendar-header button {
   background: none;
-  border: none;
+  border: 1px solid #ffffff;
   cursor: pointer;
   font-size: 18px;
   color: #ffffff;
+
 }
 
 .calendar-grid {
@@ -111,12 +112,13 @@
   color: #aaa;
 }
 
+
 @media (min-width: 768px) {
   .calendar {
     width: auto;
   }
   .calendar-header {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
   }
   .calendar-header button {

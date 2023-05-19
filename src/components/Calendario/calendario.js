@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
 import '../../assets/styles.css';
 
@@ -8,7 +8,40 @@ const Calendario = () => {
   const [task, setTask] = useState('');
   const [time, setTime] = useState('');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [tasksByDay, setTasksByDay] = useState({});
+  const [tasksByDay, setTasksByDay] = useState(() => {
+    const storedRows = localStorage.getItem('tasksData');
+    if (storedRows) {
+      return JSON.parse(storedRows);
+    } else {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tasksData', JSON.stringify(tasksByDay));
+  }, [tasksByDay]);
+
+  const handleCellChange = (value, field, formattedDate, index) => {
+    if (!tasksByDay[formattedDate] || index >= tasksByDay[formattedDate].length) {
+      return;
+    }
+
+    const updatedTasksByDay = {
+      ...tasksByDay,
+      [formattedDate]: tasksByDay[formattedDate].map((taskObj, taskIndex) => {
+        if (taskIndex === index) {
+          return {
+            ...taskObj,
+            [field]: value
+          };
+        }
+        return taskObj;
+      })
+    };
+
+    setTasksByDay(updatedTasksByDay);
+  };
+  
 
   const startDate = startOfMonth(currentDate);
   const endDate = endOfMonth(currentDate);
@@ -46,13 +79,17 @@ const Calendario = () => {
     const formattedDate = format(selectedDay, 'dd/MM/yyyy');
     const existingTasks = tasksByDay[formattedDate] || [];
 
-    const updatedTasks = [...existingTasks, { task, time, completed: false }];
+    const updatedTasks = [
+      ...existingTasks,
+      { task, time, completed: false }
+    ];
+
     const updatedTasksByDay = {
       ...tasksByDay,
       [formattedDate]: updatedTasks
     };
-    setTasksByDay(updatedTasksByDay);
 
+    setTasksByDay(updatedTasksByDay);
     handleModalClose();
   };
 
@@ -88,9 +125,11 @@ const Calendario = () => {
         ...tasksByDay,
         [formattedDate]: updatedTasks
       };
+
       setTasksByDay(updatedTasksByDay);
     }
   };
+
   const handlePrevMonth = () => {
     setCurrentDate((prevDate) => subMonths(prevDate, 1));
   };
@@ -105,19 +144,19 @@ const Calendario = () => {
         <div className="calendar-header">
           <button onClick={handlePrevMonth}>&lt;</button>
           <h2>{format(currentDate, 'MMMM yyyy')}</h2>
-          <button onClick={handleNextMonth}>&gt;</button>
+          <button className="nextPrev" onClick={handleNextMonth}>&gt;</button>
         </div>
         <div className="calendar-grid">
-          {calendarDays.map((day) => (
-            <div key={day} onClick={() => handleDayClick(day)}>
-              <div className="day-number">{format(day, 'dd')}</div>
-              <div className="day-text">
-                {format(day, 'EEEE')}
-              </div>
-              {tasksByDay[format(day, 'dd/MM/yyyy')] &&
-                tasksByDay[format(day, 'dd/MM/yyyy')].map((task, index) => (
+          {calendarDays.map((day) => {
+            const formattedDate = format(day, 'dd/MM/yyyy');
+            const dayTasks = tasksByDay[formattedDate];
+            return (
+              <div key={day} onClick={() => handleDayClick(day)}>
+                <div className="day-number">{format(day, 'dd')}</div>
+                <div className="day-text">{format(day, 'EEEE')}</div>
+                {dayTasks && dayTasks.map((task, index) => (
                   <div
-                    key={`${format(day, 'dd/MM/yyyy')}-${index}`}
+                    key={`${formattedDate}-${index}`}
                     className={`task ${task.completed ? 'completed' : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -127,8 +166,9 @@ const Calendario = () => {
                     {task.task}
                   </div>
                 ))}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
       {modalOpen && (
@@ -157,15 +197,29 @@ const Calendario = () => {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(tasksByDay).map(([date, tasks]) =>
+            {Object.entries(tasksByDay).map(([date, tasks]) =>
                 tasks &&
                 tasks.map((task, index) => (
                   <tr key={`${date}-${index}`}>
                     <td>{format(new Date(date), 'EEEE, dd MMMM yyyy')}</td>
-                    <td>{task.task}</td>
-                    <td>{task.time}</td>
                     <td>
-                      <button className="edit-button" onClick={() => handleEditTask(new Date(date), index)}>Edit</button>
+                      <input
+                        type="text"
+                        value={task.task}
+                        onChange={(e) => handleCellChange(e.target.value, 'task', date, index)}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="time"
+                        value={task.time}
+                        onChange={(e) => handleCellChange(e.target.value, 'time', date, index)}
+                      />
+                    </td>
+                    <td>
+                      <button className="edit-button" onClick={() => handleEditTask(new Date(date), index)}>
+                        Edit
+                      </button>
                       <input
                         type="checkbox"
                         defaultChecked={task.completed}
