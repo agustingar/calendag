@@ -111,22 +111,17 @@ const Calendario = () => {
     const tasks = tasksByDay[formattedDate];
 
     if (tasks) {
-      const updatedTasks = tasks.map((taskObj, taskIndex) => {
-        if (taskIndex === index) {
-          return {
-            ...taskObj,
-            completed: !taskObj.completed
-          };
-        }
-        return taskObj;
-      });
+      const updatedTasks = tasks.filter((_, taskIndex) => taskIndex !== index);
 
       const updatedTasksByDay = {
         ...tasksByDay,
         [formattedDate]: updatedTasks
       };
 
-      setTasksByDay(updatedTasksByDay);
+      setTasksByDay((prevState) => ({
+        ...prevState,
+        ...updatedTasksByDay
+      }));
     }
   };
 
@@ -218,7 +213,7 @@ const Calendario = () => {
                     </td>
                     <td>
                       <button className="edit-button" onClick={() => handleEditTask(new Date(date), index)}>
-                        Edit
+                        Delete
                       </button>
                       <input
                         type="checkbox"

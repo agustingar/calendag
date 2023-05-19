@@ -30,7 +30,10 @@ const BasicTable = () => {
         const newData = createData('');
         setRows((prevRows) => [...prevRows, newData]);
     };
-
+const removeAll = () =>{
+    localStorage.removeItem('tableData')
+    window.location.reload();
+}
     const handleCellChange = (value, field, index) => {
         const updatedRows = [...rows];
         updatedRows[index][field] = value;
@@ -95,6 +98,7 @@ const BasicTable = () => {
                 </TableBody>
             </Table>
             <Button onClick={addMore}>Añadir más</Button>
+            <Button onClick={removeAll}>Eliminar todo</Button>
         </TableContainer>
     );
 };
