@@ -7,6 +7,7 @@ const Calendario = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [task, setTask] = useState('');
   const [time, setTime] = useState('');
+  const [selectedTableDay, setSelectedTableDay] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasksByDay, setTasksByDay] = useState(() => {
     const storedRows = localStorage.getItem('tasksData');
@@ -50,11 +51,12 @@ const Calendario = () => {
 
   const handleDayClick = (day) => {
     setSelectedDay(day);
+    setSelectedTableDay(day);
     setTask('');
     setTime('');
     setModalOpen(true);
   };
-
+  
   const handleModalClose = () => {
     setModalOpen(false);
     setSelectedDay(null);
@@ -67,16 +69,39 @@ const Calendario = () => {
   };
 
   const handleTimeChange = (e) => {
-    setTime(e.target.value);
+    const value = e.target.value;
+  
+    // Verificar si el valor es una cadena vacía
+    if (value === '') {
+      setTime(value);
+      return;
+    }
+  
+    // Obtener la hora y minutos del valor
+    const [hours, minutes] = value.split(':');
+  
+    // Crear un objeto Date con la fecha actual y la hora especificada
+    const currentTime = new Date();
+    currentTime.setHours(hours);
+    currentTime.setMinutes(minutes);
+  
+    // Verificar si el objeto Date resultante es válido
+    if (isNaN(currentTime.getTime())) {
+      // El valor del campo de tiempo no es válido
+      alert('Please enter a valid time.');
+      return;
+    }
+  
+    setTime(value);
   };
-
+  
   const handleSave = () => {
     if (!task.trim() || !time.trim()) {
       alert('Please enter a task and time.');
       return;
     }
 
-    const formattedDate = format(selectedDay, 'dd/MM/yyyy');
+    const formattedDate = format(selectedDay, 'MM dd yyyy');
     const existingTasks = tasksByDay[formattedDate] || [];
 
     const updatedTasks = [
@@ -94,7 +119,7 @@ const Calendario = () => {
   };
 
   const handleEditTask = (day, index) => {
-    const formattedDate = format(day, 'dd/MM/yyyy');
+    const formattedDate = format(day, 'MM dd yyyy');
     const tasks = tasksByDay[formattedDate];
 
     if (tasks) {
@@ -107,7 +132,7 @@ const Calendario = () => {
   };
 
   const handleCompleteTask = (day, index) => {
-    const formattedDate = format(day, 'dd/MM/yyyy');
+    const formattedDate = format(day, 'MM dd yyyy');
     const tasks = tasksByDay[formattedDate];
 
     if (tasks) {
@@ -143,7 +168,7 @@ const Calendario = () => {
         </div>
         <div className="calendar-grid">
           {calendarDays.map((day) => {
-            const formattedDate = format(day, 'dd/MM/yyyy');
+            const formattedDate = format(day, ' MM dd yyyy');
             const dayTasks = tasksByDay[formattedDate];
             return (
               <div key={day} onClick={() => handleDayClick(day)}>
@@ -172,7 +197,7 @@ const Calendario = () => {
             <span className="close" onClick={handleModalClose}>
               &times;
             </span>
-            <h2>{format(selectedDay, 'EEEE, dd MMMM yyyy')}</h2>
+            <h2>{format(selectedDay, 'EEEE,  MMMM dd yyyy')}</h2>
             <input type="text" value={task} onChange={handleTaskChange} placeholder="Task" />
             <input type="time" value={time} onChange={handleTimeChange} placeholder="Time" />
             <button onClick={handleSave}>Save</button>
@@ -185,18 +210,18 @@ const Calendario = () => {
           <table>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Task</th>
-                <th>Time</th>
-                <th>Actions</th>
+                <th>Día</th>
+                <th>Tarea</th>
+                <th>Hora</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-            {Object.entries(tasksByDay).map(([date, tasks]) =>
-                tasks &&
-                tasks.map((task, index) => (
-                  <tr key={`${date}-${index}`}>
-                    <td>{format(new Date(date), 'EEEE, dd MMMM yyyy')}</td>
+           {Object.entries(tasksByDay).map(([date, tasks]) =>
+  tasks &&
+  tasks.map((task, index) => (
+    <tr key={`${date}-${index}`} className={selectedTableDay === new Date(date) ? 'selected' : ''}>
+      <td>{format(new Date(date), 'EEEE, dd MMMM yyyy')}</td>
                     <td>
                       <input
                         type="text"
@@ -213,7 +238,7 @@ const Calendario = () => {
                     </td>
                     <td>
                       <button className="edit-button" onClick={() => handleEditTask(new Date(date), index)}>
-                        Delete
+                        Edit
                       </button>
                       <input
                         type="checkbox"
