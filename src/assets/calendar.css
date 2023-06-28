@@ -148,7 +148,7 @@ tr.selected {
 @media (max-width: 850px) {
   .calendar {
     width: 100%;
-    max-width: 500px;
+    max-width: 350px;
   }
   .calendar-header {
     flex-direction: column;

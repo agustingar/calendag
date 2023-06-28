@@ -16,6 +16,8 @@
     "@testing-library/user-event": "^13.5.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.7",
+    "firebase": "^9.23.0",
+    "mongoose": "^7.2.1",
     "react": "^18.2.0",
     "react-calendar": "^4.2.1",
     "react-dom": "^18.2.0",

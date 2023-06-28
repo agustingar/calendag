@@ -168,7 +168,7 @@ const Calendario = () => {
         </div>
         <div className="calendar-grid">
           {calendarDays.map((day) => {
-            const formattedDate = format(day, ' MM dd yyyy');
+            const formattedDate = format(day, 'MM dd yyyy');
             const dayTasks = tasksByDay[formattedDate];
             return (
               <div key={day} onClick={() => handleDayClick(day)}>
